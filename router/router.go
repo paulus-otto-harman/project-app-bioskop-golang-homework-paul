@@ -24,14 +24,15 @@ func initTemplate() (*repository.WebPageData, *template.Template) {
 func NewRouter(db *sql.DB) *chi.Mux {
 	r := chi.NewRouter()
 
+	handleAuth := handler.InitAuthHandler(*service.InitAuthService(*repository.InitAuthRepo(db)))
 	handleWebTemplate := handler.InitWebPageHandler(*service.InitWebPageService(*repository.InitWebPageRepo(initTemplate())))
 
 	r.Route("/api", func(r chi.Router) {
 		r.Use(middleware.JsonResponse())
 
 		r.Post("/register", nil)
-		r.Post("/login", nil)
-		r.Post("/logout", nil)
+		r.Post("/login", handleAuth.Login)
+		r.Post("/logout", handleAuth.Logout)
 
 		r.Get("/payment-methods", nil)
 
