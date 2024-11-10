@@ -26,7 +26,20 @@ func NewRouter(db *sql.DB) *chi.Mux {
 	handleWebTemplate := handler.InitWebPageHandler(*service.InitWebPageService(*repository.InitWebPageRepo(initTemplate())))
 
 	r.Route("/api", func(r chi.Router) {
+		r.Post("/register", nil)
+		r.Post("/login", nil)
+		r.Post("/logout", nil)
 
+		r.Post("/booking", nil)
+
+		r.Route("/cinemas", func(r chi.Router) {
+			r.Get("/", nil)
+			r.Get("/{cinemaId}", nil)
+			r.Get("/{cinemaId}/seats", nil)
+		})
+
+		r.Get("/payment-methods", nil)
+		r.Post("/pay", nil)
 	})
 
 	r.Get("/app.css", handleWebTemplate.Static)
