@@ -18,8 +18,12 @@ func InitAuthHandler(authService service.AuthService) AuthHandler {
 
 func (handle *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user := model.User{}
-
 	json.NewDecoder(r.Body).Decode(&user)
+
+	if user.Username == "" || user.Password == "" {
+		lib.Response(w).Json(http.StatusUnauthorized, "Invalid username or password.")
+		return
+	}
 
 	result, err := handle.AuthService.Login(user)
 	if err != nil {

@@ -3,9 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"homework/model"
-	"log"
 	"net/http"
-	"reflect"
 )
 
 func Response(w http.ResponseWriter) ResponseWriter {
@@ -16,17 +14,27 @@ type ResponseWriter struct {
 	Writer http.ResponseWriter
 }
 
-func (response ResponseWriter) Json(statusCode int, message string, args ...any) {
+func (response ResponseWriter) Json(statusCode int, message string, args ...interface{}) {
 	r := model.Response{
 		StatusCode: statusCode,
-		Message:    &message,
 	}
 
-	if message == "" {
-		r.Message = nil
+	if message != "" {
+		r.Message = &message
 	}
 
-	log.Println(reflect.TypeOf(args), reflect.ValueOf(args))
+	switch {
+	case len(args) > 0:
+		r.Data = args[0]
+		fallthrough
+	case len(args) > 1:
+		transactionId := args[1].(int)
+		r.TransactionId = &transactionId
+		fallthrough
+	case len(args) > 2:
+		transactionId := args[1].(int)
+		r.TransactionId = &transactionId
+	}
 
 	json.NewEncoder(response.Writer).Encode(r)
 }
